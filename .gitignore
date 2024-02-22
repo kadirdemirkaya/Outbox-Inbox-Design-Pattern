@@ -1,0 +1,47 @@
+# Bin ve obj klasörleri
+bin/
+obj/
+
+# Visual Studio tarafından oluşturulan dosyalar
+.vs/
+*.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider tarafından oluşturulan dosyalar
+.idea/
+
+# Paket yükleme klasörü
+packages/
+
+# VS Code tarafından oluşturulan dosyalar
+.vscode/
+
+# macOS'te oluşan gizli dosyalar
+.DS_Store
+
+# Resharper dosyaları
+_ReSharper*/
+*.resharper
+*.resharper.user
+
+# dotCover dosyaları
+*.dotCover
+
+# dotTrace dosyaları
+*.dotTrace
+
+# NCrunch dosyaları
+*.ncrunch*
+.*crunch*.local.xml
+
+# Visual Studio Code - Dosya tabanlı ayarlar
+.vscode/
+
+# Sonuç dosyaları
+*.log
+*.vsix
+
+/src/Publisher/Infrastructure/Outbox.Persistence/Migrations/*

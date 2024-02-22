@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+  outbox.order.api:
+    container_name: outbox_order_api
+    image: ${DOCKER_REGISTRY-}outboxorderapi
+    build:
+      context: .
+      dockerfile: src/Publisher/Presentation/Outbox.Order.API/Dockerfile
+    networks:
+      - backend
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    networks:
+      - backend
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  rabbitmq:
