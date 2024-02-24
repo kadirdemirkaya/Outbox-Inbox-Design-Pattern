@@ -42,6 +42,8 @@ namespace Outbox.Product.API.Events.EventHandlers
 
                         result = await _dapperRepository.ExecuteAsync("UPDATE OrderOutboxes SET OrderOutboxStatus=@OrderOutboxStatus WHERE Id=@Id", new { OrderOutboxStatus = 3, Id = @event.Id });
 
+                        //result = await _dapperRepository.ExecuteAsync("UPDATE Orders SET IsActive=@IsActive WHERE Id=@Id", new { Id = @event.Id });
+
                         _logger.LogInformation("OrderOutbox process succesfully");
                     }
                     else

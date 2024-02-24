@@ -4,7 +4,7 @@
     {
         public int ConnectionRetryCount { get; set; } = 5;
 
-        public string DefaultTopicName { get; set; } = "SellingBuddyEventBus";
+        public string DefaultTopicName { get; set; } = "PublisherEventBus";
 
         public string EventBusConnectionString { get; set; } = String.Empty;
 
