@@ -20,6 +20,7 @@ namespace Outbox.Transaction.Log.Service.Services
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var consumer = _eventBus.GetConsumer();
+            await Task.Delay(1000);
             while (true)
             {
                 try

@@ -16,9 +16,10 @@ namespace Outbox.Shared
         public IProducer<int, string> _produceBuilder;
         public IConsumer<int, string> _consumerBuilder;
         private KafkaPersistenceConnection _kafkaPersistenceConnection;
-
+        private int index;
         public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider, bool? IsProducer) : base(eventBusConfig, serviceProvider)
         {
+            index = 0;
             if (eventBusConfig.Connection != null)
             {
                 var connJson = JsonConvert.SerializeObject(eventBusConfig.Connection, new JsonSerializerSettings()
@@ -33,10 +34,11 @@ namespace Outbox.Shared
 
             _produceBuilder = _kafkaPersistenceConnection.GetProducer();
 
-            SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
+            //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
         }
         public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider) : base(eventBusConfig, serviceProvider)
         {
+            index = 0;
             if (eventBusConfig.Connection != null)
             {
                 var connJson = JsonConvert.SerializeObject(eventBusConfig.Connection, new JsonSerializerSettings()
@@ -51,7 +53,7 @@ namespace Outbox.Shared
 
             _consumerBuilder.Subscribe(_kafkaConsumerConfig.Topic);
 
-            SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
+            //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
         }
 
         private void SubsManager_OnEventRemoved(object sender, string eventName)
@@ -81,45 +83,13 @@ namespace Outbox.Shared
             //{
             try
             {
-                var partition = new Partition(Math.Abs(serializeEvent.GetHashCode() % _kafkaProducerConfig.TopicPartitionsNumber));
-                await _produceBuilder.ProduceAsync(new TopicPartition(_kafkaProducerConfig.Topic, partition), new Message<int, string>
+                /*ar partition = new Partition(Math.Abs(serializeEvent.GetHashCode() % _kafkaProducerConfig.TopicPartitionsNumber));*/
+                await _produceBuilder.ProduceAsync(_kafkaProducerConfig.Topic, new Message<int, string>
                 {
-                    Key = partition.Value,
+                    Key = index,
                     Value = serializeEvent
                 });
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-            //});
-        }
-
-        public override async void Publish(IntegrationEvent @event)
-        {
-            var policy = Policy.Handle<SocketException>()
-                .Or<ProduceException<string, string>>()
-                .WaitAndRetry(EventBusConfig.ConnectionRetryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
-                {
-                    // log
-                });
-
-            var eventName = @event.GetType().Name;
-            eventName = ProcessEventName(eventName);
-
-            var message = JsonConvert.SerializeObject(@event);
-            //var body = Encoding.UTF8.GetBytes(message);
-
-            //policy.Execute(async () =>
-            //{
-            try
-            {
-                var partition = new Partition(Math.Abs(message.GetHashCode() % _kafkaProducerConfig.TopicPartitionsNumber));
-                await _produceBuilder.ProduceAsync(new TopicPartition(_kafkaProducerConfig.Topic, partition), new Message<int, string>
-                {
-                    Key = partition.Value,
-                    Value = message
-                });
+                index++;
             }
             catch (Exception ex)
             {

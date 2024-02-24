@@ -76,8 +76,6 @@ namespace Outbox.Shared.Events
 
 
 
-        public abstract void Publish(IntegrationEvent @event);
-
         public abstract void Publish(string serializeEvent, string type);
 
         public abstract void Subscribe<T, TH>() where T : IntegrationEvent where TH : IIntegrationEventHandler<T>;

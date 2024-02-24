@@ -38,7 +38,7 @@ class Program
                 Topic = _configuration["KafkaConsumerConfig:Topic"],
             };
 
-            services.AddScoped<IEventBus>(sp =>
+            services.AddSingleton<IEventBus>(sp =>
             {
                 return new EventBusKafka(new() { ConnectionRetryCount = 5, DefaultTopicName = "Outbox", EventBusType = EventBusType.Kafka, EventNameSuffix = "IntegrationEvent", SubscriberClientAppName = "CONSUMESERVICENAME", Connection = kafkaConsumerConfig }, sp);
             });

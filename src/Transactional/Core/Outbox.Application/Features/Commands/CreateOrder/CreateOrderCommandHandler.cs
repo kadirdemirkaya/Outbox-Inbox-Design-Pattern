@@ -32,7 +32,7 @@ namespace Outbox.Application.Features.Commands.CreateOrder
             await _orderOutboxRepository.AddAsync(orderOutbox);
             await _orderOutboxRepository.SaveChangesAsync();
 
-            _eventBus.Publish(orderCreateEvent);
+            _eventBus.Publish(JsonSerializer.Serialize(orderOutbox),typeof(OrderCreatedIntegrationEvent).Name);
 
             return new(true);
         }
