@@ -28,7 +28,7 @@ KafkaConsumerConfig kafkaConsumerConfig = new()
 
 builder.Services.AddSingleton<IEventBus>(sp =>
 {
-    return new EventBusKafka(new() { ConnectionRetryCount = 5, DefaultTopicName = "Outbox", EventBusType = EventBusType.Kafka, EventNameSuffix = "IntegrationEvent", SubscriberClientAppName = "ProductId", Connection = kafkaConsumerConfig }, sp, true);
+    return new EventBusKafka(new() { ConnectionRetryCount = 5, DefaultTopicName = "Outbox", EventBusType = EventBusType.Kafka, EventNameSuffix = "IntegrationEvent", SubscriberClientAppName = "ProductId", Connection = kafkaConsumerConfig }, sp, false);
 });
 
 builder.Services.AddTransient<OrderCreatedIntegrationEventHandler>();

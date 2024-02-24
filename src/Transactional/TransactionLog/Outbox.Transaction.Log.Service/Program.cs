@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Outbox.Shared;
 using Outbox.Shared.Abstractions;
 using Outbox.Shared.Configs;
+using Outbox.Shared.Events;
 using Outbox.Transaction.Log.Service.Services;
 
 class Program
@@ -26,7 +27,6 @@ class Program
 
             IConfiguration _configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .SetBasePath("C:/Users/Casper/Desktop/GitHub Projects/OutboxInboxDesignPattern/src/Transactional/TransactionLog/Outbox.Transaction.Log.Service")
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .Build();
 
@@ -40,11 +40,10 @@ class Program
 
             services.AddSingleton<IEventBus>(sp =>
             {
-                return new EventBusKafka(new() { ConnectionRetryCount = 5, DefaultTopicName = "Outbox", EventBusType = EventBusType.Kafka, EventNameSuffix = "IntegrationEvent", SubscriberClientAppName = "CONSUMESERVICENAME", Connection = kafkaConsumerConfig }, sp);
+                return new EventBusKafka(new() { ConnectionRetryCount = 5, EventBusType = EventBusType.Kafka, Connection = kafkaConsumerConfig }, sp, false);
             });
 
             services.AddHostedService<ConsumerBackgroundService>();
-
         });
 }
 

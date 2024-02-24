@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using Outbox.Domain.Entities;
 using Outbox.Shared.Abstractions;
-using System.Net.NetworkInformation;
 
 namespace Outbox.Transaction.Log.Service.Services
 {

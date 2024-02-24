@@ -37,8 +37,8 @@ builder.Services.AddSingleton<IEventBus>(sp =>
     return new EventBusKafka(new() { Connection = kafkaProducerConfig, ConnectionRetryCount = 5, DefaultTopicName = "Outbox", EventBusType = EventBusType.Kafka, EventNameSuffix = "IntegrationEvent", SubscriberClientAppName = "OrderAPI" }, sp, true);
 });
 
-var app = builder.Build();
 
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

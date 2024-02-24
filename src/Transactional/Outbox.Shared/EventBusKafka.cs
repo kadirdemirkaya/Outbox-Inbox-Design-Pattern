@@ -17,44 +17,75 @@ namespace Outbox.Shared
         public IConsumer<int, string> _consumerBuilder;
         private KafkaPersistenceConnection _kafkaPersistenceConnection;
         private int index;
-        public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider, bool? IsProducer) : base(eventBusConfig, serviceProvider)
+
+        public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider, bool IsProducer) : base(eventBusConfig, serviceProvider)
         {
             index = 0;
-            if (eventBusConfig.Connection != null)
+            if (eventBusConfig.Connection is not null)
             {
                 var connJson = JsonConvert.SerializeObject(eventBusConfig.Connection, new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 });
-                _kafkaProducerConfig = JsonConvert.DeserializeObject<KafkaProducerConfig>(connJson);
-            }
-            else { }
-
-            _kafkaPersistenceConnection = new(_kafkaProducerConfig);
-
-            _produceBuilder = _kafkaPersistenceConnection.GetProducer();
-
-            //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
-        }
-        public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider) : base(eventBusConfig, serviceProvider)
-        {
-            index = 0;
-            if (eventBusConfig.Connection != null)
-            {
-                var connJson = JsonConvert.SerializeObject(eventBusConfig.Connection, new JsonSerializerSettings()
+                if (IsProducer is true)
                 {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                });
-                _kafkaConsumerConfig = JsonConvert.DeserializeObject<KafkaConsumerConfig>(connJson);
+                    _kafkaProducerConfig = JsonConvert.DeserializeObject<KafkaProducerConfig>(connJson);
+                    _kafkaPersistenceConnection = new(_kafkaProducerConfig);
+                    _produceBuilder = _kafkaPersistenceConnection.GetProducer();
+                    //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
+                }
+                else
+                {
+                    _kafkaConsumerConfig = JsonConvert.DeserializeObject<KafkaConsumerConfig>(connJson);
+                    _kafkaPersistenceConnection = new(_kafkaConsumerConfig);
+                    _consumerBuilder = _kafkaPersistenceConnection.GetConsumer();
+                    _consumerBuilder.Subscribe(_kafkaConsumerConfig.Topic);
+                    //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
+                }
             }
-            else { }
-            _kafkaPersistenceConnection = new(_kafkaConsumerConfig);
-            _consumerBuilder = _kafkaPersistenceConnection.GetConsumer();
 
-            _consumerBuilder.Subscribe(_kafkaConsumerConfig.Topic);
-
-            //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
         }
+
+        #region old code
+        //public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider, bool? IsProducer) : base(eventBusConfig, serviceProvider)
+        //{
+        //    index = 0;
+        //    if (eventBusConfig.Connection != null)
+        //    {
+        //        var connJson = JsonConvert.SerializeObject(eventBusConfig.Connection, new JsonSerializerSettings()
+        //        {
+        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        //        });
+        //        _kafkaProducerConfig = JsonConvert.DeserializeObject<KafkaProducerConfig>(connJson);
+        //    }
+        //    else { }
+
+        //    _kafkaPersistenceConnection = new(_kafkaProducerConfig);
+
+        //    _produceBuilder = _kafkaPersistenceConnection.GetProducer();
+
+        //    //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
+        //}
+        //public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider) : base(eventBusConfig, serviceProvider)
+        //{
+        //    index = 0;
+        //    if (eventBusConfig.Connection != null)
+        //    {
+        //        var connJson = JsonConvert.SerializeObject(eventBusConfig.Connection, new JsonSerializerSettings()
+        //        {
+        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        //        });
+        //        _kafkaConsumerConfig = JsonConvert.DeserializeObject<KafkaConsumerConfig>(connJson);
+        //    }
+        //    else { }
+        //    _kafkaPersistenceConnection = new(_kafkaConsumerConfig);
+        //    _consumerBuilder = _kafkaPersistenceConnection.GetConsumer();
+
+        //    _consumerBuilder.Subscribe(_kafkaConsumerConfig.Topic);
+
+        //    //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
+        //}
+        #endregion
 
         private void SubsManager_OnEventRemoved(object sender, string eventName)
         {

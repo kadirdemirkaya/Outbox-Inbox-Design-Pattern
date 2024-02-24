@@ -84,6 +84,7 @@ namespace Outbox.Shared.Events
 
         public abstract void Consume(string eventName, string message);
 
+
         public abstract IConsumer<int, string> GetConsumer();
 
         public abstract IProducer<int, string> GetProducer();
