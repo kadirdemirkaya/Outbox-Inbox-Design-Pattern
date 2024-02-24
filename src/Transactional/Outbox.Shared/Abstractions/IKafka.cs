@@ -4,8 +4,8 @@ namespace Outbox.Shared.Abstractions
 {
     public interface IKafka
     {
-        IConsumer<string, string> GetConsumer();
+        IConsumer<int, string> GetConsumer();
 
-        IProducer<string, string> GetProducer();
+        IProducer<int, string> GetProducer();
     }
 }

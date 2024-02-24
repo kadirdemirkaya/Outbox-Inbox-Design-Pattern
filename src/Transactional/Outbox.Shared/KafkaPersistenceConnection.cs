@@ -7,19 +7,19 @@ namespace Outbox.Shared
     {
         private KafkaProducerConfig _kafkaProducerConfig;
         private KafkaConsumerConfig _kafkaConsumerConfig;
-        private IProducer<string, string> _produceBuilder;
-        private IConsumer<string, string> _consumerBuilder;
+        private IProducer<int, string> _produceBuilder;
+        private IConsumer<int, string> _consumerBuilder;
 
         public KafkaPersistenceConnection(KafkaProducerConfig kafkaProducerConfig)
         {
             _kafkaProducerConfig = kafkaProducerConfig;
             var producerConfig = new ProducerConfig()
             {
-                BootstrapServers = _kafkaProducerConfig.Host,
+                BootstrapServers = _kafkaProducerConfig.BootstrapServers,
                 ClientId = _kafkaProducerConfig.ClientId,
-                Acks = _kafkaProducerConfig.Acks
+                Acks = Acks.All
             };
-            _produceBuilder = new ProducerBuilder<string, string>(producerConfig).Build();
+            _produceBuilder = new ProducerBuilder<int, string>(producerConfig).Build();
         }
 
         public KafkaPersistenceConnection(KafkaConsumerConfig kafkaConsumerConfig)
@@ -29,15 +29,15 @@ namespace Outbox.Shared
             {
                 GroupId = _kafkaConsumerConfig.ConsumerGroupName,
                 BootstrapServers = _kafkaConsumerConfig.Host,
-                AutoOffsetReset = _kafkaConsumerConfig.AutoOffsetReset
+                AutoOffsetReset = AutoOffsetReset.Earliest
             };
-            _consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig).Build();
+            _consumerBuilder = new ConsumerBuilder<int, string>(consumerConfig).Build();
         }
 
-        public IProducer<string, string> GetProducer()
+        public IProducer<int, string> GetProducer()
             => _produceBuilder;
 
-        public IConsumer<string, string> GetConsumer()
+        public IConsumer<int, string> GetConsumer()
             => _consumerBuilder;
     }
 }

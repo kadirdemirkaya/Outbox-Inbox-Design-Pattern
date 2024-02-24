@@ -22,7 +22,13 @@ class Program
         .ConfigureServices((hostContext, services) =>
         {
             var sp = services.BuildServiceProvider();
-            var _configuration = sp.GetRequiredService<IConfiguration>();
+            //var _configuration = sp.GetRequiredService<IConfiguration>();
+
+            IConfiguration _configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .SetBasePath("C:/Users/Casper/Desktop/GitHub Projects/OutboxInboxDesignPattern/src/Transactional/TransactionLog/Outbox.Transaction.Log.Service")
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .Build();
 
             KafkaConsumerConfig kafkaConsumerConfig = new()
             {

@@ -45,15 +45,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outbox.Shared", "src\Transa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outbox.Transaction.Log.Service", "src\Transactional\TransactionLog\Outbox.Transaction.Log.Service\Outbox.Transaction.Log.Service.csproj", "{63BA4E9C-A9AD-4169-9C6F-5FB21C848CDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outbox.Application", "src\Transactional\Core\Outbox.Application\Outbox.Application.csproj", "{CDBD35E0-35A7-411E-A532-3B7CA039AFCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outbox.Application", "src\Transactional\Core\Outbox.Application\Outbox.Application.csproj", "{CDBD35E0-35A7-411E-A532-3B7CA039AFCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outbox.Domain", "src\Transactional\Core\Outbox.Domain\Outbox.Domain.csproj", "{1B96F184-673A-44A5-A1E1-09448A2338E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outbox.Domain", "src\Transactional\Core\Outbox.Domain\Outbox.Domain.csproj", "{1B96F184-673A-44A5-A1E1-09448A2338E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outbox.Persistence", "src\Transactional\Infrastructure\Outbox.Persistence\Outbox.Persistence.csproj", "{E0145F7E-6BBC-4C4D-B286-98EF23DF5E89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outbox.Persistence", "src\Transactional\Infrastructure\Outbox.Persistence\Outbox.Persistence.csproj", "{E0145F7E-6BBC-4C4D-B286-98EF23DF5E89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outbox.Order.API", "src\Transactional\Presentation\Outbox.Order.API\Outbox.Order.API.csproj", "{69A69144-98BA-4578-8BF5-FC1CD21CF449}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outbox.Order.API", "src\Transactional\Presentation\Outbox.Order.API\Outbox.Order.API.csproj", "{69A69144-98BA-4578-8BF5-FC1CD21CF449}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outbox.Product.API", "src\Transactional\Presentation\Outbox.Product.API\Outbox.Product.API.csproj", "{68FF9E9E-8E94-475C-A35E-39B899D2C3C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outbox.Product.API", "src\Transactional\Presentation\Outbox.Product.API\Outbox.Product.API.csproj", "{68FF9E9E-8E94-475C-A35E-39B899D2C3C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

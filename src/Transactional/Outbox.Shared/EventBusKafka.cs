@@ -13,8 +13,8 @@ namespace Outbox.Shared
         private KafkaProducerConfig _kafkaProducerConfig;
         private KafkaConsumerConfig _kafkaConsumerConfig;
         private ILogger<EventBusKafka> _logger;
-        public IProducer<string, string> _produceBuilder;
-        public IConsumer<string, string> _consumerBuilder;
+        public IProducer<int, string> _produceBuilder;
+        public IConsumer<int, string> _consumerBuilder;
         private KafkaPersistenceConnection _kafkaPersistenceConnection;
 
         public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider, bool? IsProducer) : base(eventBusConfig, serviceProvider)
@@ -30,6 +30,7 @@ namespace Outbox.Shared
             else { }
 
             _kafkaPersistenceConnection = new(_kafkaProducerConfig);
+
             _produceBuilder = _kafkaPersistenceConnection.GetProducer();
 
             SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
@@ -48,6 +49,8 @@ namespace Outbox.Shared
             _kafkaPersistenceConnection = new(_kafkaConsumerConfig);
             _consumerBuilder = _kafkaPersistenceConnection.GetConsumer();
 
+            _consumerBuilder.Subscribe(_kafkaConsumerConfig.Topic);
+
             SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
         }
 
@@ -60,7 +63,7 @@ namespace Outbox.Shared
             _consumerBuilder.Close();
         }
 
-        public override void Publish(string serializeEvent, string type)
+        public override async void Publish(string serializeEvent, string type)
         {
             var policy = Policy.Handle<SocketException>()
                    .Or<ProduceException<string, string>>()
@@ -74,25 +77,25 @@ namespace Outbox.Shared
 
             //var body = Encoding.UTF8.GetBytes(serializeEvent);
 
-            policy.Execute(async () =>
+            //policy.Execute(async () =>
+            //{
+            try
             {
-                try
+                var partition = new Partition(Math.Abs(serializeEvent.GetHashCode() % _kafkaProducerConfig.TopicPartitionsNumber));
+                await _produceBuilder.ProduceAsync(new TopicPartition(_kafkaProducerConfig.Topic, partition), new Message<int, string>
                 {
-                    var partition = new Partition(Math.Abs(serializeEvent.GetHashCode() % _kafkaProducerConfig.TopicPartitionsNumber));
-                    await _produceBuilder.ProduceAsync(new TopicPartition(_kafkaProducerConfig.Topic, partition), new Message<string, string>
-                    {
-                        Key = DateTime.Now.ToShortDateString(),
-                        Value = serializeEvent
-                    });
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-            });
+                    Key = partition.Value,
+                    Value = serializeEvent
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            //});
         }
 
-        public override void Publish(IntegrationEvent @event)
+        public override async void Publish(IntegrationEvent @event)
         {
             var policy = Policy.Handle<SocketException>()
                 .Or<ProduceException<string, string>>()
@@ -107,21 +110,22 @@ namespace Outbox.Shared
             var message = JsonConvert.SerializeObject(@event);
             //var body = Encoding.UTF8.GetBytes(message);
 
-            policy.Execute(async () =>
+            //policy.Execute(async () =>
+            //{
+            try
             {
-                try
+                var partition = new Partition(Math.Abs(message.GetHashCode() % _kafkaProducerConfig.TopicPartitionsNumber));
+                await _produceBuilder.ProduceAsync(new TopicPartition(_kafkaProducerConfig.Topic, partition), new Message<int, string>
                 {
-                    await _produceBuilder.ProduceAsync(_kafkaProducerConfig.Topic, new Message<string, string>
-                    {
-                        Key = DateTime.Now.ToShortDateString(),
-                        Value = message
-                    });
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-            });
+                    Key = partition.Value,
+                    Value = message
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            //});
         }
 
         public override void Subscribe<T, TH>()
@@ -130,7 +134,7 @@ namespace Outbox.Shared
             eventName = ProcessEventName(eventName);
             SubsMngr.AddSubscription<T, TH>();
 
-            _consumerBuilder.Subscribe(_kafkaConsumerConfig.Topic);
+            //_consumerBuilder.Subscribe(_kafkaConsumerConfig.Topic);
         }
 
         public override void UnSubscribe<T, TH>()
@@ -152,10 +156,10 @@ namespace Outbox.Shared
             }
         }
 
-        public override IConsumer<string, string> GetConsumer()
+        public override IConsumer<int, string> GetConsumer()
             => _consumerBuilder;
 
-        public override IProducer<string, string> GetProducer()
+        public override IProducer<int, string> GetProducer()
             => _produceBuilder;
     }
 }

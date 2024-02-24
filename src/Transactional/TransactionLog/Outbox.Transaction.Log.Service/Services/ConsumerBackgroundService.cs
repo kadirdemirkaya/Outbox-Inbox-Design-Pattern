@@ -1,29 +1,34 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Outbox.Domain.Entities;
 using Outbox.Shared.Abstractions;
+using System.Net.NetworkInformation;
 
 namespace Outbox.Transaction.Log.Service.Services
 {
     public class ConsumerBackgroundService : BackgroundService
     {
         private readonly IEventBus _eventBus;
+        private readonly IConfiguration _configuration;
 
-        public ConsumerBackgroundService(IEventBus eventBus)
+        public ConsumerBackgroundService(IEventBus eventBus, IConfiguration configuration)
         {
             _eventBus = eventBus;
+            _configuration = configuration;
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            var consumer = _eventBus.GetConsumer();
+            while (true)
             {
                 try
                 {
-                    var consumer = _eventBus.GetConsumer();
                     var message = consumer.Consume();
-                    //var body = System.Text.Json.JsonSerializer.Deserialize<OrderOutbox>(message.Value);
+                    var body = System.Text.Json.JsonSerializer.Deserialize<OrderOutbox>(message.Value);
 
-                    //_eventBus.Consume(body., body.);
-
+                    if (body is not null)
+                        _eventBus.Consume(body.Type, body.Payload);
                 }
                 catch (Exception ex)
                 {

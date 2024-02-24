@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\..\Core\Outbox.Application\Outbox.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Outbox.Persistence\Outbox.Persistence.csproj" />
+    <ProjectReference Include="..\..\Outbox.Shared\Outbox.Shared.csproj" />
   </ItemGroup>
 
 </Project>
