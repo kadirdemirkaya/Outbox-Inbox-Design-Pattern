@@ -46,47 +46,6 @@ namespace Outbox.Shared
 
         }
 
-        #region old code
-        //public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider, bool? IsProducer) : base(eventBusConfig, serviceProvider)
-        //{
-        //    index = 0;
-        //    if (eventBusConfig.Connection != null)
-        //    {
-        //        var connJson = JsonConvert.SerializeObject(eventBusConfig.Connection, new JsonSerializerSettings()
-        //        {
-        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //        });
-        //        _kafkaProducerConfig = JsonConvert.DeserializeObject<KafkaProducerConfig>(connJson);
-        //    }
-        //    else { }
-
-        //    _kafkaPersistenceConnection = new(_kafkaProducerConfig);
-
-        //    _produceBuilder = _kafkaPersistenceConnection.GetProducer();
-
-        //    //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
-        //}
-        //public EventBusKafka(EventBusConfig eventBusConfig, IServiceProvider serviceProvider) : base(eventBusConfig, serviceProvider)
-        //{
-        //    index = 0;
-        //    if (eventBusConfig.Connection != null)
-        //    {
-        //        var connJson = JsonConvert.SerializeObject(eventBusConfig.Connection, new JsonSerializerSettings()
-        //        {
-        //            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //        });
-        //        _kafkaConsumerConfig = JsonConvert.DeserializeObject<KafkaConsumerConfig>(connJson);
-        //    }
-        //    else { }
-        //    _kafkaPersistenceConnection = new(_kafkaConsumerConfig);
-        //    _consumerBuilder = _kafkaPersistenceConnection.GetConsumer();
-
-        //    _consumerBuilder.Subscribe(_kafkaConsumerConfig.Topic);
-
-        //    //SubsMngr.OnEventRemoved += SubsManager_OnEventRemoved;
-        //}
-        #endregion
-
         private void SubsManager_OnEventRemoved(object sender, string eventName)
         {
             eventName = ProcessEventName(eventName);
@@ -96,7 +55,7 @@ namespace Outbox.Shared
             _consumerBuilder.Close();
         }
 
-        public override async void Publish(string serializeEvent, string type)
+        public override void Publish(string serializeEvent, string type)
         {
             var policy = Policy.Handle<SocketException>()
                    .Or<ProduceException<string, string>>()
@@ -110,23 +69,22 @@ namespace Outbox.Shared
 
             //var body = Encoding.UTF8.GetBytes(serializeEvent);
 
-            //policy.Execute(async () =>
-            //{
-            try
+            policy.Execute(async () =>
             {
-                /*ar partition = new Partition(Math.Abs(serializeEvent.GetHashCode() % _kafkaProducerConfig.TopicPartitionsNumber));*/
-                await _produceBuilder.ProduceAsync(_kafkaProducerConfig.Topic, new Message<int, string>
+                try
                 {
-                    Key = index,
-                    Value = serializeEvent
-                });
-                index++;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-            //});
+                    await _produceBuilder.ProduceAsync(_kafkaProducerConfig.Topic, new Message<int, string>
+                    {
+                        Key = index,
+                        Value = serializeEvent
+                    });
+                    index++;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            });
         }
 
         public override void Subscribe<T, TH>()
