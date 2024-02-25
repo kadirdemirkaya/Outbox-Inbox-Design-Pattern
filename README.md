@@ -1,6 +1,6 @@
 # Outbox Inbox Pattern
 
-#### In this project, a project based on this has been developed.
+#### In this project, a project based on OutboxInbox Pattern was developed.
 
 # Outbox What is Inbox Pattern?
 
