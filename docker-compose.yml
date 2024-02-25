@@ -1,15 +1,6 @@
 version: '3.4'
 
 services:
-  outbox.order.api:
-    container_name: outbox_order_api
-    image: ${DOCKER_REGISTRY-}outboxorderapi
-    build:
-      context: .
-      dockerfile: src/Publisher/Presentation/Outbox.Order.API/Dockerfile
-    networks:
-      - backend
-
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3-management
@@ -54,55 +45,3 @@ networks:
 
 volumes:
   rabbitmq:
-
-
-
-
-
-
-# version: '3.4'
-
-# services:
-#   outbox.order.api:
-#     container_name: outbox_order_api
-#     image: ${DOCKER_REGISTRY-}outboxorderapi
-#     build:
-#       context: .
-#       dockerfile: src/Publisher/Presentation/Outbox.Order.API/Dockerfile
-#     networks:
-#       - backend
-
-#   zoo1:
-#     image: zookeeper:3.4.9
-#     container_name: sample-outbox-zookeeper
-#     hostname: zoo1
-#     ports:
-#       - '2181:2181'
-#     environment:
-#       ZOO_MY_ID: 1
-#       ZOO_PORT: 2181
-#     networks:
-#       - backend
-
-#   kafka:
-#     image: confluentinc/cp-kafka:5.5.1
-#     container_name: sample-outbox-kafkabroker
-#     hostname: kafka
-#     ports:
-#       - '9092:9092'
-#       - '9999:9999'
-#     environment:
-#       KAFKA_BROKER_ID: 1
-#       KAFKA_ZOOKEEPER_CONNECT: 'zoo1:2181'
-#       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
-#       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
-#       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-#       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#     depends_on:
-#       - zoo1
-#     networks:
-#       - backend
-
-# networks:
-#   backend:
-#     driver: bridge

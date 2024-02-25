@@ -45,5 +45,3 @@ _ReSharper*/
 *.vsix
 
 /src/Publisher/Infrastructure/Outbox.Persistence/Migrations/*
-/docker-compose.yml
-docker-compose.yml
