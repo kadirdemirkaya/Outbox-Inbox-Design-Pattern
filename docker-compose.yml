@@ -1,6 +1,7 @@
 version: '3.4'
 
 services:
+
   outbox.order.api:
     container_name: outbox_order_api
     image: ${DOCKER_REGISTRY-}outboxorderapi
@@ -9,6 +10,19 @@ services:
       dockerfile: src/Publisher/Presentation/Outbox.Order.API/Dockerfile
     networks:
       - backend
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server
+    container_name: mssql
+    networks:
+      - backend
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "pa55w0rd!"
+    volumes:
+      - mssql_data:/var/opt/mssql
 
   rabbitmq:
     container_name: rabbitmq
@@ -48,9 +62,22 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: kafdrop
+    networks: 
+      - backend 
+    depends_on:
+      - broker    
+    ports:
+      - 9000:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka:29092
+
 networks:
   backend:
     driver: bridge
 
 volumes:
-  rabbitmq:
+  rabbitmq:    
+  mssql_data:  
