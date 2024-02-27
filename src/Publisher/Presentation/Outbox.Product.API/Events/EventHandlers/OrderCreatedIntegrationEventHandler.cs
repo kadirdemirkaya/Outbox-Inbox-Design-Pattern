@@ -3,7 +3,6 @@ using Outbox.Shared.Abstractions;
 using Outbox.Shared.IntegrationEvents;
 using Outbox.Shared.Repositories;
 using System.Data;
-using System.Reflection.PortableExecutable;
 using System.Text.Json;
 
 namespace Outbox.Product.API.Events.EventHandlers
@@ -42,7 +41,7 @@ namespace Outbox.Product.API.Events.EventHandlers
 
                         result = await _dapperRepository.ExecuteAsync("UPDATE OrderOutboxes SET OrderOutboxStatus=@OrderOutboxStatus WHERE Id=@Id", new { OrderOutboxStatus = 3, Id = @event.Id });
 
-                        //result = await _dapperRepository.ExecuteAsync("UPDATE Orders SET IsActive=@IsActive WHERE Id=@Id", new { Id = @event.Id });
+                        //result = await _dapperRepository.ExecuteAsync("UPDATE Orders SET IsActive=@IsActive WHERE Id=@Id", new { IsActive = true, Id = @event.Id });
 
                         _logger.LogInformation("OrderOutbox process succesfully");
                     }
@@ -61,7 +60,6 @@ namespace Outbox.Product.API.Events.EventHandlers
                     throw new Exception(ex.Message);
                 }
             }
-
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Outbox.Application.Repositories;
 using Outbox.Application.Configs;
+using Outbox.Application.Repositories;
 using Outbox.Persistence.Context;
 using Outbox.Persistence.Repositories;
-using Outbox.Shared.Abstractions;
 
 namespace Outbox.Persistence
 {

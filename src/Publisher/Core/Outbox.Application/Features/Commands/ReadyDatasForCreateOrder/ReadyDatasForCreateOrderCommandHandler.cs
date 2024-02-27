@@ -20,7 +20,6 @@ namespace Outbox.Application.Features.Commands.ReadyDatasForCreateOrder
             _quantity = 10;
         }
 
-
         public async Task<ReadyDatasForCreateOrderCommandResponse> Handle(ReadyDatasForCreateOrderCommandRequest request, CancellationToken cancellationToken)
         {
             for (int i = 0; i < 5; i++)

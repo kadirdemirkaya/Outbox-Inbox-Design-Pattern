@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Commands\ReadyDatasForCreateOrder\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Outbox.Shared\Outbox.Shared.csproj" />
     <ProjectReference Include="..\Outbox.Domain\Outbox.Domain.csproj" />
   </ItemGroup>

@@ -25,6 +25,5 @@ namespace Outbox.Persistence.Context
                 optionsBuilder.UseSqlServer(GetConfig.GetDatabaseConfig());
             }
         }
-
     }
 }

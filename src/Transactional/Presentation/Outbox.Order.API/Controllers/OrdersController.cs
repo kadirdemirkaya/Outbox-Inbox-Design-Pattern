@@ -21,7 +21,7 @@ namespace Outbox.Order.API.Controllers
         {
             CreateOrderCommandRequest request = new(createOrderDto);
             CreateOrderCommandResponse response = await _mediator.Send(request);
-            return Ok(response);
+            return Ok(response.response);
         }
 
         [HttpPost("ReadyDataForCreateOrder")]
@@ -29,7 +29,8 @@ namespace Outbox.Order.API.Controllers
         {
             ReadyDatasForCreateOrderCommandRequest request = new();
             ReadyDatasForCreateOrderCommandResponse response = await _mediator.Send(request);
-            return Ok(response);
+            return Ok(response.response);
         }
+
     }
 }

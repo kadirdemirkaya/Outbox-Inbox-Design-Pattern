@@ -11,13 +11,14 @@ namespace Outbox.Application.Features.Commands.CreateOrder
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderOutboxRepository _orderOutboxRepository;
-        private readonly IEventBus _eventBus;
-
-        public CreateOrderCommandHandler(IOrderOutboxRepository orderOutboxRepository, IOrderRepository orderRepository, IEventBus eventBus)
+        private readonly IMessageBus<string, OrderOutbox> _messageBus;
+        private int i;
+        public CreateOrderCommandHandler(IOrderOutboxRepository orderOutboxRepository, IOrderRepository orderRepository, IMessageBus<string, OrderOutbox> messageBus)
         {
             _orderOutboxRepository = orderOutboxRepository;
             _orderRepository = orderRepository;
-            _eventBus = eventBus;
+            _messageBus = messageBus;
+            i = 0;
         }
 
         public async Task<CreateOrderCommandResponse> Handle(CreateOrderCommandRequest request, CancellationToken cancellationToken)
@@ -32,7 +33,8 @@ namespace Outbox.Application.Features.Commands.CreateOrder
             await _orderOutboxRepository.AddAsync(orderOutbox);
             await _orderOutboxRepository.SaveChangesAsync();
 
-            _eventBus.Publish(JsonSerializer.Serialize(orderOutbox),typeof(OrderCreatedIntegrationEvent).Name);
+            await _messageBus.PublishAsync(i.ToString(), orderOutbox);
+            i++;
 
             return new(true);
         }

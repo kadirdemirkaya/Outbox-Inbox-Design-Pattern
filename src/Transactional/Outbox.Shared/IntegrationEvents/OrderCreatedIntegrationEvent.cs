@@ -1,8 +1,6 @@
-﻿using Outbox.Shared.Events;
-
-namespace Outbox.Shared.IntegrationEvents
+﻿namespace Outbox.Shared.IntegrationEvents
 {
-    public class OrderCreatedIntegrationEvent : IntegrationEvent
+    public class OrderCreatedIntegrationEvent 
     {
         public Guid Id { get; set; }
         public int Quantity { get; set; }

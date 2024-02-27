@@ -17,14 +17,14 @@ IHost host = Host.CreateDefaultBuilder(args)
             configurator.AddJob<OrderOutboxPublishJob>(options => options.WithIdentity(jobKey));
 
             TriggerKey triggerKey = new("OrderOutboxPublishTrigger");
-            
+
             configurator.AddTrigger(options => options.ForJob(jobKey)
                         .WithIdentity(triggerKey)
                         .StartAt(DateTime.UtcNow)
                         .WithSimpleSchedule
                         (
-                            builder => builder.WithIntervalInSeconds(30) 
-                                              .RepeatForever() 
+                            builder => builder.WithIntervalInSeconds(30)
+                                              .RepeatForever()
                         ));
         });
 

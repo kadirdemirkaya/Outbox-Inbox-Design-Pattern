@@ -1,5 +1,6 @@
 ﻿using Dapper;
-using Outbox.Shared.Abstractions;
+using Outbox.Domain.Entities;
+using Outbox.Shared.Consumer;
 using Outbox.Shared.IntegrationEvents;
 using Outbox.Shared.Repositories;
 using System.Data;
@@ -7,7 +8,7 @@ using System.Text.Json;
 
 namespace Outbox.Product.API.Events.EventHandlers
 {
-    public class OrderCreatedIntegrationEventHandler : IIntegrationEventHandler<OrderCreatedIntegrationEvent>
+    public class OrderCreatedIntegrationEventHandler : IKafkaHandler<string, OrderOutbox>
     {
         private DapperRepository _dapperRepository;
         private readonly ILogger<OrderCreatedIntegrationEventHandler> _logger;
@@ -21,44 +22,37 @@ namespace Outbox.Product.API.Events.EventHandlers
             _dbConnection = _dapperRepository.Connection;
         }
 
-        public async Task Handle(OrderCreatedIntegrationEvent @event)
+        public async Task HandleAsync(string key, OrderOutbox value)
         {
             int result;
 
-            using (IDbTransaction transaction = _dbConnection.BeginTransaction())
+            try
             {
-                try
+                int count = _dapperRepository.Connection.QueryFirstOrDefault<int>(@"SELECT COUNT(*) FROM OrderInboxes WHERE Id = @Id", new { Id = value.Id });
+
+                string sqlQuery = "INSERT INTO OrderInboxes (Id,Type,Payload,OrderOutboxStatus, CreatedDate, IsActive) VALUES (@Id,@Type,@Payload,@OrderOutboxStatus,@CreatedDate,@IsActive)";
+
+                if (count == 0)
                 {
-                    int count = _dapperRepository.Connection.QueryFirstOrDefault<int>(@"SELECT COUNT(*) FROM OrderInboxes WHERE Id = @Id", new { Id = @event.Id });
+                    // Datas will handle in this part ! 
 
-                    string sqlQuery = "INSERT INTO OrderInboxes (Id,Type,Payload,OrderOutboxStatus, CreatedDate, IsActive) VALUES (@Id,@Type,@Payload,@OrderOutboxStatus,@CreatedDate,@IsActive)";
+                    int affectedRows = _dapperRepository.Connection.Execute(sqlQuery, new { Id = value.Id, Type = typeof(OrderCreatedIntegrationEvent).Name, Payload = JsonSerializer.Serialize(value), OrderOutboxStatus = 3, CreatedDate = DateTime.Now, IsActive = true });
+                    result = await _dapperRepository.ExecuteAsync("UPDATE OrderOutboxes SET OrderOutboxStatus=@OrderOutboxStatus WHERE Id=@Id", new { OrderOutboxStatus = 3, Id = value.Id });
 
-                    if (count == 0)
-                    {
-                        // Datas will handle in this part ! 
-
-                        int affectedRows = _dapperRepository.Connection.Execute(sqlQuery, new { Id = @event.Id, Type = typeof(OrderCreatedIntegrationEvent).Name, Payload = JsonSerializer.Serialize(@event), OrderOutboxStatus = 3, CreatedDate = DateTime.Now, IsActive = true });
-
-                        result = await _dapperRepository.ExecuteAsync("UPDATE OrderOutboxes SET OrderOutboxStatus=@OrderOutboxStatus WHERE Id=@Id", new { OrderOutboxStatus = 3, Id = @event.Id });
-
-                        _logger.LogInformation("OrderOutbox process succesfully");
-                    }
-                    else
-                    {
-                        result = await _dapperRepository.ExecuteAsync("UPDATE OrderOutboxes SET OrderOutboxStatus=@OrderOutboxStatus WHERE Id=@Id", new { OrderOutboxStatus = 4, Id = @event.Id });
-
-                        _logger.LogWarning("OrderOutbox process not succesfully");
-                    }
-                    transaction.Commit();
+                    _logger.LogInformation("OrderOutbox process succesfully");
                 }
-                catch (Exception ex)
+                else
                 {
-                    _logger.LogWarning("OrderOutbox process occured a error : " + ex.Message);
-                    transaction.Rollback();
-                    throw new Exception(ex.Message);
+                    result = await _dapperRepository.ExecuteAsync("UPDATE OrderOutboxes SET OrderOutboxStatus=@OrderOutboxStatus WHERE Id=@Id", new { OrderOutboxStatus = 4, Id = value.Id });
+
+                    _logger.LogWarning("OrderOutbox process not succesfully");
                 }
             }
-
+            catch (Exception ex)
+            {
+                _logger.LogWarning("OrderOutbox process occured a error : " + ex.Message);
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

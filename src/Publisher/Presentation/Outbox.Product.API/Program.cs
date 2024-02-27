@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Outbox.Product.API.Events.EventHandlers;
 using Outbox.Shared;
 using Outbox.Shared.Abstractions;
@@ -36,6 +35,7 @@ app.MapControllers();
 
 var sp = builder.Services.BuildServiceProvider();
 var eventBus = sp.GetRequiredService<IEventBus>();
+
 eventBus.Subscribe<OrderCreatedIntegrationEvent, OrderCreatedIntegrationEventHandler>();
 
 app.Run();

@@ -62,7 +62,7 @@ namespace Outbox.Shared.Events
                         var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
 
                         var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-                        await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
+                        await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent! })!;
                     }
                 }
 
@@ -71,7 +71,6 @@ namespace Outbox.Shared.Events
 
             return processed;
         }
-
 
 
 
