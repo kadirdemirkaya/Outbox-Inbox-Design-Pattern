@@ -398,4 +398,8 @@ FodyWeavers.xsd
 *.sln.iml
 
 **/Logs/*
-**/Migrations/*
+**/Migrations*
+**/docker-compose.*
+**/Dockerfile*
+**/.dockerignore
+
